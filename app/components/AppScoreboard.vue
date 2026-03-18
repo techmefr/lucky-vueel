@@ -28,9 +28,9 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
 
 <template>
     <div class="flex flex-col min-h-0">
-        <div class="sticky top-0 z-10 flex items-center justify-between pb-3" style="background: rgba(255,255,255,0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px)">
-            <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #000">
-                Scores de partie
+        <div class="sticky top-0 z-10 flex items-center justify-between pb-3" style="background: transparent">
+            <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #111">
+                Scores
             </h2>
             <UButton
                 v-if="playerManager.players.some(p => (p.score ?? 0) !== 0)"
@@ -43,13 +43,20 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
         </div>
 
         <div v-if="playerManager.players.length > 0" class="space-y-1 mt-1">
-            <div v-for="player in sorted" :key="player.id" class="flex items-center gap-3 px-2 py-1.5 rounded-xl">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: player.color }" />
-                <span class="flex-1 text-base font-medium truncate" style="color: #000">{{ player.name }}</span>
-                <div class="flex items-center gap-1">
+            <div
+                v-for="player in sorted"
+                :key="player.id"
+                class="flex items-center gap-3 px-2 py-2 rounded-2xl transition-colors hover:bg-black/4"
+            >
+                <span
+                    class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                    :style="{ backgroundColor: player.color }"
+                />
+                <span class="flex-1 text-sm font-semibold truncate" style="color: #222">{{ player.name }}</span>
+                <div class="flex items-center gap-0.5">
                     <button
-                        class="w-7 h-7 rounded-lg flex items-center justify-center text-base font-bold transition-colors hover:bg-black/10"
-                        style="color: #1a1a1a"
+                        class="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-bold transition-colors hover:bg-black/8 active:bg-black/15"
+                        style="color: #333"
                         @click="playerManager.adjustScore(player.id, -1)"
                     >
                         −
@@ -58,8 +65,8 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
                     <input
                         v-if="editingId === player.id"
                         v-model="editingValue"
-                        class="w-12 text-center text-base font-black tabular-nums rounded-md px-1 py-0.5 outline-none"
-                        style="font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.08); color: #000; border: 1px solid rgba(0,0,0,0.25)"
+                        class="w-11 text-center text-base font-black tabular-nums rounded-xl px-1 py-1 outline-none"
+                        style="font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.07); color: #111; border: 1.5px solid rgba(0,0,0,0.2)"
                         type="number"
                         autofocus
                         @blur="commitEdit(player.id)"
@@ -67,16 +74,16 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
                     />
                     <span
                         v-else
-                        class="w-12 text-center text-base font-black tabular-nums cursor-text rounded-md px-1 py-0.5 transition-colors hover:bg-black/10"
-                        style="font-family: 'Nunito', sans-serif; color: #000"
+                        class="w-11 text-center text-base font-black tabular-nums cursor-text rounded-xl px-1 py-1 transition-colors hover:bg-black/8"
+                        style="font-family: 'Nunito', sans-serif; color: #111"
                         @click="startEdit(player.id, player.score ?? 0)"
                     >
                         {{ player.score ?? 0 }}
                     </span>
 
                     <button
-                        class="w-7 h-7 rounded-lg flex items-center justify-center text-base font-bold transition-colors hover:bg-black/10"
-                        style="color: #1a1a1a"
+                        class="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-bold transition-colors hover:bg-black/8 active:bg-black/15"
+                        style="color: #333"
                         @click="playerManager.adjustScore(player.id, 1)"
                     >
                         +
@@ -85,7 +92,7 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
             </div>
         </div>
 
-        <p v-else class="text-base italic py-2 text-center" style="color: #1a1a1a">
+        <p v-else class="text-sm italic py-3 text-center" style="color: #777">
             Ajoute des joueurs pour suivre les scores
         </p>
     </div>

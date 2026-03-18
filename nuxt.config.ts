@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     ssr: false,
 
     app: {
+        baseURL: process.env.NUXT_APP_BASE_URL ?? '/',
         head: {
             link: [
                 { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

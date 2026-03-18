@@ -25,10 +25,10 @@ function handleKeydown(e: KeyboardEvent): void {
 
 <template>
     <div class="flex flex-col min-h-0">
-        <div class="sticky top-0 z-10 flex items-center justify-between pb-3 mb-1" style="background: rgba(255,255,255,0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px)">
-            <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #000">
+        <div class="sticky top-0 z-10 flex items-center justify-between pb-3 mb-1" style="background: transparent">
+            <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #111">
                 Joueurs
-                <span class="font-normal text-sm ml-1" style="color: #555">({{ playerManager.players.length }})</span>
+                <span class="font-normal text-sm ml-1" style="color: #666">({{ playerManager.players.length }})</span>
             </h2>
             <UButton size="sm" icon="i-lucide-plus" color="neutral" variant="outline" @click="isAddOpen = true">
                 Ajouter
@@ -50,7 +50,7 @@ function handleKeydown(e: KeyboardEvent): void {
         <div
             v-if="playerManager.players.length >= 3"
             class="sticky top-12 z-10 flex items-center gap-3 py-2"
-            style="background: rgba(255,255,255,0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px)"
+            style="background: transparent"
         >
             <button class="relative flex-shrink-0" @click="sessionStore.toggleRemoveWinners()">
                 <div
@@ -73,20 +73,29 @@ function handleKeydown(e: KeyboardEvent): void {
             <span class="text-sm select-none" style="color: #333">Retirer les gagnants</span>
         </div>
 
-        <ul v-if="playerManager.players.length > 0" class="space-y-1 mt-1">
+        <ul v-if="playerManager.players.length > 0" class="space-y-1.5 mt-1">
             <li
                 v-for="player in playerManager.players"
                 :key="player.id"
                 :class="[
-                    'flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all group',
-                    player.isActive ? 'hover:bg-black/5' : 'opacity-40',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-2xl cursor-pointer transition-all group',
+                    player.isActive
+                        ? 'hover:bg-black/6'
+                        : 'opacity-35',
                 ]"
+                :style="player.isActive ? { background: `linear-gradient(135deg, ${player.color}18 0%, transparent 60%)` } : {}"
                 @click="playerManager.togglePlayer(player.id)"
             >
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" :style="{ backgroundColor: player.color }" />
                 <span
-                    :class="['flex-1 text-base font-medium', { 'line-through': !player.isActive }]"
-                    style="color: #000"
+                    class="w-3 h-3 rounded-full flex-shrink-0"
+                    :style="{
+                        backgroundColor: player.color,
+                        boxShadow: player.isActive ? `0 0 0 3px ${player.color}33` : 'none'
+                    }"
+                />
+                <span
+                    :class="['flex-1 text-base font-semibold', { 'line-through': !player.isActive }]"
+                    style="color: #111"
                 >
                     {{ player.name }}
                 </span>
@@ -95,13 +104,13 @@ function handleKeydown(e: KeyboardEvent): void {
                     size="xs"
                     variant="ghost"
                     color="neutral"
-                    class="opacity-0 group-hover:opacity-60 transition-opacity"
+                    class="opacity-0 group-hover:opacity-50 transition-opacity"
                     @click.stop="playerManager.removePlayer(player.id)"
                 />
             </li>
         </ul>
 
-        <p v-else class="text-base italic py-4 text-center" style="color: #1a1a1a">
+        <p v-else class="text-base italic py-6 text-center" style="color: #555">
             Aucun joueur — ajoute des participants
         </p>
     </div>

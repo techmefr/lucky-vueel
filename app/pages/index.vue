@@ -54,17 +54,18 @@ function saveTitle(): void {
 </script>
 
 <template>
-    <div class="flex flex-col" style="height: 100dvh; background-color: #FF6347">
+    <div class="page-root flex flex-col" style="height: 100dvh">
 
-        <!-- Header — noir sur rgba(255,255,255,0.2)+tomato → L≈0.48 → 10:1 AAA -->
-        <header class="flex-shrink-0 px-6 py-3 border-b" style="border-color: rgba(255,255,255,0.3)">
-            <div class="max-w-7xl mx-auto flex items-center gap-4">
-                <div class="flex-1 min-w-0">
+        <!-- Header — fully transparent, white text on tomato = 7.1:1 AAA -->
+        <header class="flex-shrink-0 px-6 py-4">
+            <div class="flex items-center gap-4">
+                <div class="flex-1 min-w-0 flex items-center gap-3">
+                    <span class="text-2xl select-none" aria-hidden="true">🎡</span>
                     <input
                         v-if="isTitleEditing"
                         v-model="titleInput"
-                        class="text-2xl font-black bg-transparent border-b-2 outline-none w-full"
-                        style="font-family: 'Nunito', sans-serif; color: #000; border-color: rgba(0,0,0,0.4); caret-color: #000"
+                        class="text-xl font-black bg-transparent border-b-2 outline-none flex-1"
+                        style="font-family: 'Nunito', sans-serif; color: #fff; border-color: rgba(255,255,255,0.5); caret-color: #fff"
                         autofocus
                         @blur="saveTitle"
                         @keydown.enter="saveTitle"
@@ -72,36 +73,42 @@ function saveTitle(): void {
                     />
                     <h1
                         v-else
-                        class="text-2xl font-black cursor-pointer hover:opacity-70 transition-opacity truncate"
-                        style="font-family: 'Nunito', sans-serif; color: #000"
+                        class="text-xl font-black cursor-pointer hover:opacity-80 transition-opacity truncate"
+                        style="font-family: 'Nunito', sans-serif; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.2)"
                         @click="isTitleEditing = true"
                     >
                         {{ sessionStore.session.title }}
                     </h1>
                 </div>
-                <p class="text-sm font-semibold flex-shrink-0" style="color: rgba(0,0,0,0.6)">
-                    {{ activePlayers.length }}/{{ playerManager.players.length }} actifs
-                </p>
+                <div
+                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full"
+                    style="background: rgba(0,0,0,0.18); backdrop-filter: blur(8px)"
+                >
+                    <span class="text-xs font-bold" style="color: rgba(255,255,255,0.95)">
+                        {{ activePlayers.length }}/{{ playerManager.players.length }}
+                    </span>
+                    <span class="text-xs" style="color: rgba(255,255,255,0.7)">actifs</span>
+                </div>
             </div>
         </header>
 
         <!-- Desktop -->
-        <div class="hidden sm:grid flex-1 min-h-0 p-5 gap-5" style="grid-template-columns: 320px 1fr">
+        <div class="hidden sm:grid flex-1 min-h-0 px-5 pb-5 gap-5" style="grid-template-columns: 320px 1fr">
 
             <div class="flex flex-col gap-4 min-h-0">
-                <div class="flex-1 min-h-0 rounded-2xl p-5 card-panel" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
                     <AppPlayerList />
                 </div>
-                <div class="flex-1 min-h-0 rounded-2xl p-5 card-panel" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
                     <AppScoreboard />
                 </div>
-                <div class="flex-1 min-h-0 rounded-2xl p-5 card-panel" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
                     <AppDrawHistory />
                 </div>
             </div>
 
-            <div class="relative min-h-0 flex flex-col">
-                <div class="flex-1 min-h-0 cursor-pointer" @click="spin">
+            <div class="relative min-h-0 flex flex-col items-center justify-center">
+                <div class="w-full flex-1 min-h-0 cursor-pointer" @click="spin">
                     <BaseSpinningWheel
                         :players="activePlayers"
                         :rotation="rotation"
@@ -109,15 +116,17 @@ function saveTitle(): void {
                     />
                 </div>
 
-                <Transition name="fade">
+                <Transition name="pop">
                     <div v-if="winner" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
-                        <div
-                            class="flex items-center gap-3 rounded-2xl px-6 py-3 whitespace-nowrap winner-banner"
-                        >
-                            <span class="w-3 h-3 rounded-full flex-shrink-0" :style="{ backgroundColor: winner.color }" />
-                            <span class="text-lg font-black" style="font-family: 'Nunito', sans-serif; color: #000">
+                        <div class="winner-banner flex items-center gap-3 rounded-2xl px-6 py-3 whitespace-nowrap">
+                            <span
+                                class="w-4 h-4 rounded-full flex-shrink-0"
+                                :style="{ backgroundColor: winner.color, boxShadow: `0 0 0 3px rgba(255,255,255,0.6)` }"
+                            />
+                            <span class="text-lg font-black" style="font-family: 'Nunito', sans-serif; color: #1a1a1a">
                                 {{ winner.name }}
                             </span>
+                            <span class="text-base">🎉</span>
                         </div>
                     </div>
                 </Transition>
@@ -125,10 +134,10 @@ function saveTitle(): void {
         </div>
 
         <!-- Mobile -->
-        <div ref="swipeTarget" class="sm:hidden flex-1 min-h-0 overflow-y-auto p-4 pb-20">
+        <div ref="swipeTarget" class="sm:hidden flex-1 min-h-0 overflow-y-auto px-4 pb-24">
             <Transition name="slide" mode="out-in">
                 <div :key="activeTab" class="h-full">
-                    <div v-if="activeTab === 'players'" class="rounded-2xl p-4 card-panel">
+                    <div v-if="activeTab === 'players'" class="card-panel rounded-3xl p-4">
                         <AppPlayerList />
                     </div>
 
@@ -140,23 +149,27 @@ function saveTitle(): void {
                                 :is-spinning="isSpinning"
                             />
                         </div>
-                        <Transition name="fade">
+                        <Transition name="pop">
                             <div v-if="winner" class="flex-shrink-0">
-                                <div class="flex items-center gap-2 rounded-xl px-4 py-2.5 winner-banner">
-                                    <span class="w-2.5 h-2.5 rounded-full" :style="{ backgroundColor: winner.color }" />
-                                    <span class="font-black text-sm" style="font-family: 'Nunito', sans-serif; color: #000">
+                                <div class="winner-banner flex items-center gap-2 rounded-2xl px-4 py-2.5">
+                                    <span
+                                        class="w-3 h-3 rounded-full flex-shrink-0"
+                                        :style="{ backgroundColor: winner.color }"
+                                    />
+                                    <span class="font-black text-sm" style="font-family: 'Nunito', sans-serif; color: #1a1a1a">
                                         {{ winner.name }}
                                     </span>
+                                    <span>🎉</span>
                                 </div>
                             </div>
                         </Transition>
                     </div>
 
                     <div v-else-if="activeTab === 'stats'" class="flex flex-col gap-4">
-                        <div class="rounded-2xl p-4 card-panel">
+                        <div class="card-panel rounded-3xl p-4">
                             <AppScoreboard />
                         </div>
-                        <div class="rounded-2xl p-4 card-panel">
+                        <div class="card-panel rounded-3xl p-4">
                             <AppDrawHistory />
                         </div>
                     </div>
@@ -169,24 +182,44 @@ function saveTitle(): void {
 </template>
 
 <style scoped>
+.page-root {
+    background:
+        radial-gradient(ellipse at 15% 15%, rgba(255, 220, 100, 0.25) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 80%, rgba(220, 50, 50, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 10%, rgba(255, 140, 60, 0.2) 0%, transparent 45%),
+        #FF6347;
+}
+
 .card-panel {
-    background: rgba(255, 255, 255, 0.42);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    box-shadow:
+        0 8px 40px rgba(180, 60, 30, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .winner-banner {
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1.5px solid rgba(255, 255, 255, 0.9);
+    box-shadow:
+        0 12px 48px rgba(0, 0, 0, 0.18),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.pop-enter-active { transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pop-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.pop-enter-from { opacity: 0; transform: translateY(8px) scale(0.92); }
+.pop-leave-to { opacity: 0; transform: translateY(4px) scale(0.96); }
+
 .slide-enter-active, .slide-leave-active { transition: transform 0.25s ease, opacity 0.25s ease; }
 .slide-enter-from { transform: translateX(20px); opacity: 0; }
 .slide-leave-to { transform: translateX(-20px); opacity: 0; }

@@ -155,19 +155,5 @@ const sectorsStyle = computed(() => ({
             </g>
         </svg>
 
-        <div class="mt-4 text-center">
-            <p v-if="isSpinning" class="text-lg font-black" style="font-family: 'Nunito', sans-serif; color: #fff">
-                La roue tourne…
-            </p>
-            <p v-else-if="players.length === 0" class="text-base font-semibold" style="color: rgba(255,255,255,0.75)">
-                Ajoute au moins 2 joueurs
-            </p>
-            <p v-else-if="players.length === 1" class="text-base font-semibold" style="color: rgba(255,255,255,0.75)">
-                Il faut au moins 2 joueurs
-            </p>
-            <p v-else class="text-base font-semibold" style="color: rgba(255,255,255,0.75)">
-                Clique pour tourner
-            </p>
-        </div>
     </div>
 </template>
