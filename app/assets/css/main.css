@@ -1,0 +1,58 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+    --font-sans: 'Inter', sans-serif;
+    --font-display: 'Nunito', sans-serif;
+
+    --color-primary-50: #fff1f0;
+    --color-primary-100: #ffe1de;
+    --color-primary-200: #ffc8c2;
+    --color-primary-300: #ffa198;
+    --color-primary-400: #ff6b5e;
+    --color-primary-500: #e8776a;
+    --color-primary-600: #d45f52;
+    --color-primary-700: #b84a3e;
+    --color-primary-800: #9a3830;
+    --color-primary-900: #7c2d27;
+    --color-primary-950: #4a1510;
+}
+
+body {
+    background-color: tomato;
+    font-family: var(--font-sans);
+    color: white;
+}
+
+.wheel-svg {
+    width: 100%;
+    height: auto;
+    max-width: 460px;
+    cursor: pointer;
+    transition: opacity 0.2s, filter 0.2s;
+}
+
+.wheel-svg:hover {
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.15));
+}
+
+.wheel-svg.is-spinning {
+    cursor: not-allowed;
+}
+
+.sectors-group {
+    transform-origin: 365px 365px;
+    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+}
+
+@media (max-width: 768px) {
+    .wheel-svg {
+        max-width: 340px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wheel-svg {
+        max-width: 290px;
+    }
+}
