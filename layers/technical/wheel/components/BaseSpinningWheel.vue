@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { IPlayer } from '../../layers/domain/player/composables/usePlayerManager'
+import type { IWheelPlayer } from '../composables/useWheelSpin'
 
 interface Props {
-    players: IPlayer[]
+    players: IWheelPlayer[]
     rotation: number
     isSpinning: boolean
 }
@@ -58,19 +58,27 @@ const sectorsStyle = computed(() => ({
     transform: `rotate(${props.rotation}deg)`,
     transition: props.isSpinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
 }))
+
+const ariaLabel = computed(() => {
+    if (props.isSpinning) return 'La roue tourne'
+    if (props.players.length === 0) return 'Roue vide — ajoutez des joueurs'
+    return `Roue avec ${props.players.length} joueur${props.players.length > 1 ? 's' : ''} : ${props.players.map(p => p.name).join(', ')}`
+})
 </script>
 
 <template>
-    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center">
+    <div class="wheel-container">
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 730 730"
             :class="['wheel-svg', { 'is-spinning': isSpinning }]"
-            style="width: 100%; height: 100%"
+            role="img"
+            :aria-label="ariaLabel"
+            :aria-busy="isSpinning"
         >
-            <circle class="frame" cx="365" cy="365" r="347.6" fill="#fff" />
+            <circle cx="365" cy="365" r="347.6" fill="#fff" />
 
-            <g class="sticks" fill="#fff">
+            <g fill="#fff">
                 <rect x="360.4" width="9.3" height="24.33" rx="4" ry="4" />
                 <rect x="352.8" y="713.2" width="24.3" height="9.27" rx="4" ry="4" transform="translate(1082.8 352.8) rotate(90)" />
                 <rect x="176.4" y="54.8" width="24.3" height="9.27" rx="4" ry="4" transform="translate(145.8 -133.6) rotate(60)" />
@@ -89,8 +97,7 @@ const sectorsStyle = computed(() => ({
                 <template v-if="singlePlayer">
                     <circle :cx="CX" :cy="CY" :r="RADIUS" :fill="singlePlayer.color" stroke="#fff" stroke-width="2" />
                     <text
-                        :x="CX"
-                        :y="CY"
+                        :x="CX" :y="CY"
                         fill="#fff"
                         font-size="24"
                         font-weight="bold"
@@ -102,7 +109,7 @@ const sectorsStyle = computed(() => ({
                     </text>
                 </template>
 
-                <template v-else-if="sectors">
+                <template v-else-if="sectors?.length">
                     <g v-for="(sector, i) in sectors" :key="i">
                         <path :d="sector.pathData" :fill="sector.color" stroke="#fff" stroke-width="2" />
                         <text
@@ -124,8 +131,7 @@ const sectorsStyle = computed(() => ({
                 <template v-else>
                     <circle :cx="CX" :cy="CY" :r="RADIUS" fill="#e5e7eb" stroke="#fff" stroke-width="2" />
                     <text
-                        :x="CX"
-                        :y="CY"
+                        :x="CX" :y="CY"
                         fill="#9ca3af"
                         font-size="20"
                         text-anchor="middle"
@@ -154,6 +160,15 @@ const sectorsStyle = computed(() => ({
                 <path d="M681.7,166.9a9.3,9.3,0,0,0-6.6,4.8l-.8,2.1a14.9,14.9,0,0,0-.2,2.1,8.8,8.8,0,0,0,1.1,4.2,9.2,9.2,0,0,0,2.9,3,7.6,7.6,0,0,0,2.9,1.3l1.1.2a8.6,8.6,0,0,0,4.2-.6,8.4,8.4,0,0,0,3.4-2.5,7.4,7.4,0,0,0,2-3.8,8.5,8.5,0,0,0-.1-4.2,8.4,8.4,0,0,0-2.1-3.8,7.4,7.4,0,0,0-3.5-2.3l-1-.3A12.2,12.2,0,0,0,681.7,166.9Z" fill="#ccc" />
             </g>
         </svg>
-
     </div>
 </template>
+
+<style scoped>
+.wheel-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>

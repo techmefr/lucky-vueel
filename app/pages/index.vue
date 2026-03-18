@@ -8,7 +8,14 @@ const sessionStore = useSessionStore()
 const toast = useToast()
 
 const activePlayers = playerManager.activePlayers
-const { isSpinning, rotation, winner, spin } = useWheelSpin(activePlayers)
+
+const { isSpinning, rotation, spin } = useWheelSpin(activePlayers, player => {
+    sessionStore.addSpinResult(player.name, player.color)
+    toast.add({ title: `${player.name} gagne !`, color: 'success' })
+    if (sessionStore.session.removeWinners && activePlayers.value.length > 1) {
+        playerManager.togglePlayer(player.id)
+    }
+})
 
 const isTitleEditing = ref(false)
 const titleInput = ref(sessionStore.session.title)
@@ -37,15 +44,6 @@ useSwipe(swipeTarget, {
     },
 })
 
-watch(winner, (newWinner) => {
-    if (!newWinner) return
-    sessionStore.addSpinResult(newWinner.name, newWinner.color)
-    toast.add({ title: `🎉 ${newWinner.name} gagne !`, color: 'success' })
-    if (sessionStore.session.removeWinners && activePlayers.value.length > 1) {
-        playerManager.togglePlayer(newWinner.id)
-    }
-})
-
 function saveTitle(): void {
     if (titleInput.value.trim()) sessionStore.setTitle(titleInput.value)
     else titleInput.value = sessionStore.session.title
@@ -56,7 +54,6 @@ function saveTitle(): void {
 <template>
     <div class="page-root flex flex-col" style="height: 100dvh">
 
-        <!-- Header — fully transparent, white text on tomato = 7.1:1 AAA -->
         <header class="flex-shrink-0 px-6 py-4">
             <div class="flex items-center gap-4">
                 <div class="flex-1 min-w-0 flex items-center gap-3">
@@ -64,8 +61,7 @@ function saveTitle(): void {
                     <input
                         v-if="isTitleEditing"
                         v-model="titleInput"
-                        class="text-xl font-black bg-transparent border-b-2 outline-none flex-1"
-                        style="font-family: 'Nunito', sans-serif; color: #fff; border-color: rgba(255,255,255,0.5); caret-color: #fff"
+                        class="header-title-input flex-1"
                         autofocus
                         @blur="saveTitle"
                         @keydown.enter="saveTitle"
@@ -73,21 +69,15 @@ function saveTitle(): void {
                     />
                     <h1
                         v-else
-                        class="text-xl font-black cursor-pointer hover:opacity-80 transition-opacity truncate"
-                        style="font-family: 'Nunito', sans-serif; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.2)"
+                        class="header-title flex-1 truncate"
                         @click="isTitleEditing = true"
                     >
                         {{ sessionStore.session.title }}
                     </h1>
                 </div>
-                <div
-                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-full"
-                    style="background: rgba(0,0,0,0.18); backdrop-filter: blur(8px)"
-                >
-                    <span class="text-xs font-bold" style="color: rgba(255,255,255,0.95)">
-                        {{ activePlayers.length }}/{{ playerManager.players.length }}
-                    </span>
-                    <span class="text-xs" style="color: rgba(255,255,255,0.7)">actifs</span>
+                <div class="player-counter">
+                    <span class="counter-active">{{ activePlayers.length }}/{{ playerManager.players.length }}</span>
+                    <span class="counter-label">actifs</span>
                 </div>
             </div>
         </header>
@@ -96,13 +86,13 @@ function saveTitle(): void {
         <div class="hidden sm:grid flex-1 min-h-0 px-5 pb-5 gap-5" style="grid-template-columns: 320px 1fr">
 
             <div class="flex flex-col gap-4 min-h-0">
-                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5 overflow-y-auto">
                     <AppPlayerList />
                 </div>
-                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5 overflow-y-auto">
                     <AppScoreboard />
                 </div>
-                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5" style="overflow-y: auto">
+                <div class="flex-1 min-h-0 card-panel rounded-3xl p-5 overflow-y-auto">
                     <AppDrawHistory />
                 </div>
             </div>
@@ -115,7 +105,6 @@ function saveTitle(): void {
                         :is-spinning="isSpinning"
                     />
                 </div>
-
             </div>
         </div>
 
@@ -173,24 +162,53 @@ function saveTitle(): void {
         inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
-.winner-banner {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border: 1.5px solid rgba(255, 255, 255, 0.9);
-    box-shadow:
-        0 12px 48px rgba(0, 0, 0, 0.18),
-        0 4px 12px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 1);
+.header-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: opacity 0.15s;
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.header-title:hover {
+    opacity: 0.8;
+}
 
-.pop-enter-active { transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.pop-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
-.pop-enter-from { opacity: 0; transform: translateY(8px) scale(0.92); }
-.pop-leave-to { opacity: 0; transform: translateY(4px) scale(0.96); }
+.header-title-input {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #fff;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+    outline: none;
+    caret-color: #fff;
+}
+
+.player-counter {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(8px);
+}
+
+.counter-active {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.counter-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+}
 
 .slide-enter-active, .slide-leave-active { transition: transform 0.25s ease, opacity 0.25s ease; }
 .slide-enter-from { transform: translateX(20px); opacity: 0; }

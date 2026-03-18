@@ -1,22 +1,22 @@
 import confetti from 'canvas-confetti'
-import type { IPlayer } from '../../layers/domain/player/composables/usePlayerManager'
 
-export function useWheelSpin(activePlayers: Ref<IPlayer[]>) {
+export interface IWheelPlayer {
+    id: string
+    name: string
+    color: string
+}
+
+export function useWheelSpin(activePlayers: Ref<IWheelPlayer[]>, onWin: (player: IWheelPlayer) => void) {
     const isSpinning = ref(false)
     const rotation = ref(0)
-    const winner = ref<IPlayer | null>(null)
 
     async function spin(): Promise<void> {
         if (isSpinning.value || activePlayers.value.length < 2) return
 
         const players = [...activePlayers.value]
         isSpinning.value = true
-        winner.value = null
 
-        const baseRotation = 3600
-        const randomOffset = Math.random() * 360
-        const newRotation = rotation.value + baseRotation + randomOffset
-
+        const newRotation = rotation.value + 3600 + Math.random() * 360
         const finalDegree = newRotation % 360
         const segmentAngle = 360 / players.length
         const computedIndex =
@@ -31,8 +31,8 @@ export function useWheelSpin(activePlayers: Ref<IPlayer[]>) {
                 isSpinning.value = false
                 return
             }
-            winner.value = picked
             isSpinning.value = false
+            onWin(picked)
             triggerConfetti()
         }, 4000)
     }
@@ -59,7 +59,6 @@ export function useWheelSpin(activePlayers: Ref<IPlayer[]>) {
     return {
         isSpinning: readonly(isSpinning),
         rotation: readonly(rotation),
-        winner: readonly(winner),
         spin,
     }
 }

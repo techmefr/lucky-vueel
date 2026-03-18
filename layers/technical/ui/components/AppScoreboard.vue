@@ -28,16 +28,15 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
 
 <template>
     <div class="flex flex-col min-h-0">
-        <div class="sticky top-0 z-10 flex items-center justify-between pb-3" style="background: rgba(255,255,255,0.82)">
-            <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #111">
-                Scores
-            </h2>
+        <div class="card-header sticky top-0 z-10 flex items-center justify-between pb-3 mb-1">
+            <h2 class="section-title">Scores</h2>
             <UButton
                 v-if="playerManager.players.some(p => (p.score ?? 0) !== 0)"
                 size="xs"
                 icon="i-lucide-rotate-ccw"
                 variant="ghost"
                 color="neutral"
+                aria-label="Réinitialiser les scores"
                 @click="playerManager.resetScores()"
             />
         </div>
@@ -46,17 +45,17 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
             <div
                 v-for="player in sorted"
                 :key="player.id"
-                class="flex items-center gap-3 px-2 py-2 rounded-2xl transition-colors hover:bg-black/4"
+                class="score-row"
             >
                 <span
                     class="w-2.5 h-2.5 rounded-full flex-shrink-0"
                     :style="{ backgroundColor: player.color }"
                 />
-                <span class="flex-1 text-sm font-semibold truncate" style="color: #222">{{ player.name }}</span>
+                <span class="flex-1 text-sm font-semibold truncate text-label">{{ player.name }}</span>
                 <div class="flex items-center gap-0.5">
                     <button
-                        class="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-bold transition-colors hover:bg-black/8 active:bg-black/15"
-                        style="color: #333"
+                        class="score-btn"
+                        :aria-label="`Enlever un point à ${player.name}`"
                         @click="playerManager.adjustScore(player.id, -1)"
                     >
                         −
@@ -65,25 +64,26 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
                     <input
                         v-if="editingId === player.id"
                         v-model="editingValue"
-                        class="w-11 text-center text-base font-black tabular-nums rounded-xl px-1 py-1 outline-none"
-                        style="font-family: 'Nunito', sans-serif; background: rgba(0,0,0,0.07); color: #111; border: 1.5px solid rgba(0,0,0,0.2)"
+                        class="score-input"
                         type="number"
                         autofocus
+                        :aria-label="`Score de ${player.name}`"
                         @blur="commitEdit(player.id)"
                         @keydown="e => handleEditKeydown(e, player.id)"
                     />
                     <span
                         v-else
-                        class="w-11 text-center text-base font-black tabular-nums cursor-text rounded-xl px-1 py-1 transition-colors hover:bg-black/8"
-                        style="font-family: 'Nunito', sans-serif; color: #111"
+                        class="score-display"
+                        role="button"
+                        :aria-label="`Score de ${player.name} : ${player.score ?? 0}. Cliquer pour modifier`"
                         @click="startEdit(player.id, player.score ?? 0)"
                     >
                         {{ player.score ?? 0 }}
                     </span>
 
                     <button
-                        class="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-bold transition-colors hover:bg-black/8 active:bg-black/15"
-                        style="color: #333"
+                        class="score-btn"
+                        :aria-label="`Ajouter un point à ${player.name}`"
                         @click="playerManager.adjustScore(player.id, 1)"
                     >
                         +
@@ -92,8 +92,88 @@ function handleEditKeydown(e: KeyboardEvent, id: string): void {
             </div>
         </div>
 
-        <p v-else class="text-sm italic py-3 text-center" style="color: #777">
+        <p v-else class="text-sm italic py-6 text-center text-label-muted">
             Ajoute des joueurs pour suivre les scores
         </p>
     </div>
 </template>
+
+<style scoped>
+.card-header {
+    background: var(--color-card-bg);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.125rem;
+    color: var(--color-label);
+}
+
+.score-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 1rem;
+    transition: background 0.15s;
+}
+
+.score-row:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.score-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-label-secondary);
+    transition: background 0.15s;
+}
+
+.score-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.score-btn:active {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.score-input {
+    width: 2.75rem;
+    text-align: center;
+    font-size: 1rem;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+    outline: none;
+    background: rgba(0, 0, 0, 0.07);
+    color: var(--color-label);
+    border: 1.5px solid rgba(0, 0, 0, 0.2);
+}
+
+.score-display {
+    width: 2.75rem;
+    text-align: center;
+    font-size: 1rem;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+    cursor: text;
+    color: var(--color-label);
+    transition: background 0.15s;
+}
+
+.score-display:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+</style>

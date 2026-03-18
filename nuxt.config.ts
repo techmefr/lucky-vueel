@@ -4,6 +4,8 @@ export default defineNuxtConfig({
     extends: [
         './layers/domain/player',
         './layers/domain/session',
+        './layers/technical/wheel',
+        './layers/technical/ui',
     ],
 
     modules: [
