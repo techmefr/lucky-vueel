@@ -25,7 +25,7 @@ function handleKeydown(e: KeyboardEvent): void {
 
 <template>
     <div class="flex flex-col min-h-0">
-        <div class="sticky top-0 z-10 flex items-center justify-between pb-3 mb-1" style="background: transparent">
+        <div class="sticky top-0 z-10 flex items-center justify-between pb-3 mb-1" style="background: rgba(255,255,255,0.82)">
             <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #111">
                 Joueurs
                 <span class="font-normal text-sm ml-1" style="color: #666">({{ playerManager.players.length }})</span>
@@ -50,7 +50,7 @@ function handleKeydown(e: KeyboardEvent): void {
         <div
             v-if="playerManager.players.length >= 3"
             class="sticky top-12 z-10 flex items-center gap-3 py-2"
-            style="background: transparent"
+            style="background: rgba(255,255,255,0.82)"
         >
             <button class="relative flex-shrink-0" @click="sessionStore.toggleRemoveWinners()">
                 <div

@@ -116,20 +116,6 @@ function saveTitle(): void {
                     />
                 </div>
 
-                <Transition name="pop">
-                    <div v-if="winner" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
-                        <div class="winner-banner flex items-center gap-3 rounded-2xl px-6 py-3 whitespace-nowrap">
-                            <span
-                                class="w-4 h-4 rounded-full flex-shrink-0"
-                                :style="{ backgroundColor: winner.color, boxShadow: `0 0 0 3px rgba(255,255,255,0.6)` }"
-                            />
-                            <span class="text-lg font-black" style="font-family: 'Nunito', sans-serif; color: #1a1a1a">
-                                {{ winner.name }}
-                            </span>
-                            <span class="text-base">🎉</span>
-                        </div>
-                    </div>
-                </Transition>
             </div>
         </div>
 
@@ -149,20 +135,6 @@ function saveTitle(): void {
                                 :is-spinning="isSpinning"
                             />
                         </div>
-                        <Transition name="pop">
-                            <div v-if="winner" class="flex-shrink-0">
-                                <div class="winner-banner flex items-center gap-2 rounded-2xl px-4 py-2.5">
-                                    <span
-                                        class="w-3 h-3 rounded-full flex-shrink-0"
-                                        :style="{ backgroundColor: winner.color }"
-                                    />
-                                    <span class="font-black text-sm" style="font-family: 'Nunito', sans-serif; color: #1a1a1a">
-                                        {{ winner.name }}
-                                    </span>
-                                    <span>🎉</span>
-                                </div>
-                            </div>
-                        </Transition>
                     </div>
 
                     <div v-else-if="activeTab === 'stats'" class="flex flex-col gap-4">

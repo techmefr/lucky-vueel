@@ -21,7 +21,7 @@ const totalDraws = computed(() => sessionStore.session.spinHistory.length)
 
 <template>
     <div class="flex flex-col min-h-0">
-        <div class="sticky top-0 z-10 flex items-center justify-between pb-3" style="background: transparent">
+        <div class="sticky top-0 z-10 flex items-center justify-between pb-3" style="background: rgba(255,255,255,0.82)">
             <h2 class="font-black text-lg" style="font-family: 'Nunito', sans-serif; color: #111">
                 Tirages
             </h2>
